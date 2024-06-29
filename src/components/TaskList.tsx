@@ -3,12 +3,7 @@ import { initialTasks } from '../initialTasks/InitialTasks';
 import TaskItem from './TaskItem';
 import { Input, Button, Text } from '@mantine/core';
 import { v4 as uuidv4 } from 'uuid';
-
-interface Task {
-	id: string;
-	text: string;
-	done: boolean;
-}
+import { Task } from '../initialTasks/InitialTasks';
 
 export default function ManageTasks() {
 	const [tasks, setTasks] = useState<Task[]>(() => {
