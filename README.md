@@ -1,5 +1,9 @@
-# React + TypeScript + Vite
+# ToDo List App
 
-# uuid lib
+### Stack
 
-ToDo List App
+- React
+- TypeScript
+- Vite
+- uuid library
+- mantine styled components
