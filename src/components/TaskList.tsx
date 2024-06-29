@@ -61,9 +61,10 @@ export default function ManageTasks() {
 			task.id === id ? { ...task, text } : task
 		);
 
-		setEditableTask(null);
 		setTasks(updatedTasks);
+		setEditableTask(null);
 	}
+
 	function submitOnEnter(e: React.KeyboardEvent<HTMLInputElement>) {
 		if (e.key === 'Enter') {
 			addTask();
@@ -97,16 +98,17 @@ export default function ManageTasks() {
 					onKeyDown={submitOnEnter}
 					error={!!error}
 				/>
-				{error && <Text className="error">{error}</Text>}{' '}
+				{error && <Text className="error">{error}</Text>}
 				<Button variant="filled" color="rgba(15, 2, 2, 1)" onClick={addTask}>
 					Add
 				</Button>
 			</div>
-			{tasks
-				.filter((task) => !task.done)
-				.map((task) => (
-					<ul className="tasks" key={task.id}>
+			<ul className="tasks">
+				{tasks
+					.filter((task) => !task.done)
+					.map((task) => (
 						<TaskItem
+							key={task.id}
 							task={task}
 							handleEdit={editTask}
 							editableTask={editableTask}
@@ -114,18 +116,20 @@ export default function ManageTasks() {
 							saveEditTask={saveEditTask}
 							handleCheckboxChange={handleCheckboxChange}
 						/>
-					</ul>
-				))}
+					))
+					.reverse()}
+			</ul>
 
 			{tasks.some((task) => task.done) && (
 				<div className="divider">Done Tasks</div>
 			)}
 
-			{tasks
-				.filter((task) => task.done)
-				.map((task) => (
-					<ul className="tasks_done" key={task.id}>
+			<ul className="tasks_done">
+				{tasks
+					.filter((task) => task.done)
+					.map((task) => (
 						<TaskItem
+							key={task.id}
 							task={task}
 							handleEdit={editTask}
 							editableTask={editableTask}
@@ -133,8 +137,9 @@ export default function ManageTasks() {
 							saveEditTask={saveEditTask}
 							handleCheckboxChange={handleCheckboxChange}
 						/>
-					</ul>
-				))}
+					))
+					.reverse()}
+			</ul>
 		</>
 	);
 }

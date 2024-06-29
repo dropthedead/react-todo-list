@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { ReactElement, useRef, useState } from 'react';
 import { Button, Checkbox, Input } from '@mantine/core';
 type PropsType = {
 	task: {
@@ -24,7 +24,36 @@ export default function TaskItem({
 	saveEditTask,
 	handleCheckboxChange,
 }: PropsType): ReactElement {
-	const [addValueInput, setValueInput] = useState('');
+	const [addValueInput, setValueInput] = useState(task.text);
+	const isSavingRef = useRef(false);
+	const [error, setError] = useState('');
+
+	const handleBlur = () => {
+		if (isSavingRef.current) {
+			isSavingRef.current = false;
+			return;
+		}
+		if (addValueInput.trim() !== '' && addValueInput !== task.text) {
+			saveEditTask(task.id, addValueInput, task.text);
+		}
+	};
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setValueInput(e.target.value);
+		if (!e.target.value.trim()) {
+			setError('Task cannot be empty!');
+
+			return;
+		}
+		setError('');
+	};
+
+	const handleSaveClick = () => {
+		isSavingRef.current = true;
+		saveEditTask(task.id, addValueInput, task.text);
+
+		isSavingRef.current = false;
+	};
 	return (
 		<>
 			<li className="item_list">
@@ -39,8 +68,10 @@ export default function TaskItem({
 						<Input
 							className="input_edit"
 							value={addValueInput}
-							placeholder={task.text}
-							onChange={(e) => setValueInput(e.target.value)}
+							placeholder={addValueInput}
+							onChange={handleInputChange}
+							onBlur={handleBlur}
+							error={!!error}
 						/>
 					) : (
 						<div className="task_text">{task.text}</div>
@@ -51,7 +82,8 @@ export default function TaskItem({
 						<Button
 							variant="filled"
 							color="rgba(15, 2, 2, 1)"
-							onClick={() => saveEditTask(task.id, addValueInput, task.text)}
+							onMouseDown={() => (isSavingRef.current = true)}
+							onClick={handleSaveClick}
 						>
 							Save
 						</Button>
