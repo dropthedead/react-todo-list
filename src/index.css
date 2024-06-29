@@ -1,0 +1,16 @@
+body {
+	margin: 0;
+	display: flex;
+	place-items: center;
+	min-width: 320px;
+	min-height: 100vh;
+	background-color: #15aabf;
+}
+
+button:hover {
+	box-shadow: 0 4px 10px rgba(21, 170, 191, 0.6);
+}
+button:focus,
+button:focus-visible {
+	outline: 4px auto -webkit-focus-ring-color;
+}
