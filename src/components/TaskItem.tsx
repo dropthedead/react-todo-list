@@ -14,6 +14,7 @@ type PropsType = {
 	): void;
 	saveEditTask(id: string, text: string, placeholder: string): void;
 	handleCheckboxChange: (id: string, done: boolean) => void;
+	index: number;
 };
 
 export default function TaskItem({
@@ -23,6 +24,7 @@ export default function TaskItem({
 	deleteTask,
 	saveEditTask,
 	handleCheckboxChange,
+	index,
 }: PropsType): ReactElement {
 	const [addValueInput, setValueInput] = useState(task.text);
 	const isSavingRef = useRef(false);
@@ -72,6 +74,7 @@ export default function TaskItem({
 							onChange={handleInputChange}
 							onBlur={handleBlur}
 							error={!!error}
+							tabIndex={index}
 						/>
 					) : (
 						<div className="task_text">{task.text}</div>

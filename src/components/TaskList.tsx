@@ -71,10 +71,16 @@ export default function ManageTasks() {
 		}
 	}
 	function handleCheckboxChange(id: string, done: boolean) {
-		const updatedTasks = tasks.map((task) =>
-			task.id === id ? { ...task, done } : task
-		);
-		setTasks(updatedTasks);
+		setTasks((prevState: Task[]) => {
+			const updatedTasks = prevState.map((task) =>
+				task.id === id ? { ...task, done } : task
+			);
+			const sortedTasks = updatedTasks.sort((a, b) => {
+				if (a.done === b.done) return 0;
+				return a.done ? -1 : 1;
+			});
+			return sortedTasks;
+		});
 		setEditableTask(null);
 	}
 	return (
@@ -106,10 +112,11 @@ export default function ManageTasks() {
 			<ul className="tasks">
 				{tasks
 					.filter((task) => !task.done)
-					.map((task) => (
+					.map((task, index) => (
 						<TaskItem
 							key={task.id}
 							task={task}
+							index={index}
 							handleEdit={editTask}
 							editableTask={editableTask}
 							deleteTask={deleteTask}
@@ -127,10 +134,11 @@ export default function ManageTasks() {
 			<ul className="tasks_done">
 				{tasks
 					.filter((task) => task.done)
-					.map((task) => (
+					.map((task, index) => (
 						<TaskItem
 							key={task.id}
 							task={task}
+							index={index}
 							handleEdit={editTask}
 							editableTask={editableTask}
 							deleteTask={deleteTask}
