@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
-import { initialTasks } from '../initialTasks/InitialTasks';
+import { initialTasks, Task } from '../initialTasks/InitialTasks';
 import TaskItem from './TaskItem';
 import { Input, Button, Text } from '@mantine/core';
 import { v4 as uuidv4 } from 'uuid';
-import { Task } from '../initialTasks/InitialTasks';
 
 export default function ManageTasks() {
 	const [tasks, setTasks] = useState<Task[]>(() => {
 		const storedTasks = localStorage.getItem('tasks');
-		return storedTasks ? JSON.parse(storedTasks) : initialTasks;
+		return storedTasks
+			? JSON.parse(storedTasks)
+			: initialTasks.map((task, index) => ({ ...task, initialIndex: index }));
 	});
 	const [editableTask, setEditableTask] = useState<null | string>(null);
 	const [addValueInput, setValueInput] = useState('');
@@ -17,8 +18,12 @@ export default function ManageTasks() {
 	useEffect(() => {
 		const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
 		if (storedTasks.length === 0) {
-			localStorage.setItem('tasks', JSON.stringify(initialTasks));
-			setTasks(initialTasks);
+			const initialTasksWithIndex = initialTasks.map((task, index) => ({
+				...task,
+				initialIndex: index,
+			}));
+			localStorage.setItem('tasks', JSON.stringify(initialTasksWithIndex));
+			setTasks(initialTasksWithIndex);
 		} else {
 			setTasks(storedTasks);
 		}
@@ -31,11 +36,12 @@ export default function ManageTasks() {
 	function editTask(id: string) {
 		setEditableTask(id);
 	}
+
 	function deleteTask(
 		id: string,
 		e: React.MouseEvent<HTMLButtonElement, MouseEvent>
 	) {
-		e.preventDefault;
+		e.preventDefault();
 		setTasks((prevState: Task[]) => prevState.filter((x) => x.id !== id));
 	}
 
@@ -47,11 +53,17 @@ export default function ManageTasks() {
 
 		setTasks((prevState: Task[]) => [
 			...prevState,
-			{ id: uuidv4(), text: addValueInput, done: false },
+			{
+				id: uuidv4(),
+				text: addValueInput,
+				done: false,
+				initialIndex: prevState.length,
+			},
 		]);
 		setValueInput('');
 		setError('');
 	}
+
 	function saveEditTask(id: string, text: string, placeholder: string) {
 		if (!text.trim()) {
 			text = placeholder;
@@ -70,19 +82,23 @@ export default function ManageTasks() {
 			addTask();
 		}
 	}
+
 	function handleCheckboxChange(id: string, done: boolean) {
 		setTasks((prevState: Task[]) => {
 			const updatedTasks = prevState.map((task) =>
 				task.id === id ? { ...task, done } : task
 			);
-			const sortedTasks = updatedTasks.sort((a, b) => {
-				if (a.done === b.done) return 0;
-				return a.done ? -1 : 1;
-			});
-			return sortedTasks;
+
+			const tasksDone = updatedTasks.filter((task) => task.done);
+			const tasksNotDone = updatedTasks
+				.filter((task) => !task.done)
+				.sort((a, b) => a.initialIndex - b.initialIndex);
+
+			return [...tasksNotDone, ...tasksDone];
 		});
 		setEditableTask(null);
 	}
+
 	return (
 		<>
 			<h1>Tasks</h1>
@@ -123,8 +139,7 @@ export default function ManageTasks() {
 							saveEditTask={saveEditTask}
 							handleCheckboxChange={handleCheckboxChange}
 						/>
-					))
-					.reverse()}
+					))}
 			</ul>
 
 			{tasks.some((task) => task.done) && (
@@ -134,6 +149,7 @@ export default function ManageTasks() {
 			<ul className="tasks_done">
 				{tasks
 					.filter((task) => task.done)
+					.reverse()
 					.map((task, index) => (
 						<TaskItem
 							key={task.id}
@@ -145,8 +161,7 @@ export default function ManageTasks() {
 							saveEditTask={saveEditTask}
 							handleCheckboxChange={handleCheckboxChange}
 						/>
-					))
-					.reverse()}
+					))}
 			</ul>
 		</>
 	);

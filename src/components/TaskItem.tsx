@@ -1,10 +1,12 @@
 import React, { ReactElement, useRef, useState } from 'react';
 import { Button, Checkbox, Input } from '@mantine/core';
+
 type PropsType = {
 	task: {
 		text: string;
 		id: string;
 		done: boolean;
+		initialIndex: number;
 	};
 	handleEdit(id: string): void;
 	editableTask: string | null;
@@ -44,7 +46,6 @@ export default function TaskItem({
 		setValueInput(e.target.value);
 		if (!e.target.value.trim()) {
 			setError('Task cannot be empty!');
-
 			return;
 		}
 		setError('');
@@ -53,9 +54,9 @@ export default function TaskItem({
 	const handleSaveClick = () => {
 		isSavingRef.current = true;
 		saveEditTask(task.id, addValueInput, task.text);
-
 		isSavingRef.current = false;
 	};
+
 	return (
 		<>
 			<li className="item_list">
